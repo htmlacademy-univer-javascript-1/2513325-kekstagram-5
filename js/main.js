@@ -1,6 +1,3 @@
-// Функция для проверки длины строки
-const checkLength = (string, maxLength) => string.length <= maxLength;
-
 // Функция для генерации случайного целого числа
 const getRandomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 
@@ -54,6 +51,5 @@ const generatePhotos = () => {
   return photos;
 };
 
-// Создаем массив фотографий
+// Создаем массив фотографий (не используем console.log)
 const photoArray = generatePhotos();
-console.log(photoArray);
