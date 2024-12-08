@@ -1,3 +1,8 @@
-import { generatePhotos } from 'js/data.js';
-// Создаем массив фотографий (не используем console.log)
+import { generatePhotos } from './data.js';
+import { renderThumbnails } from './render-thumbnails.js';
+
+// Генерация данных
 const photoArray = generatePhotos();
+
+// Отрисовка миниатюр
+renderThumbnails(photoArray);

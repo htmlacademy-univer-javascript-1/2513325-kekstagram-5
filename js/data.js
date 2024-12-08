@@ -1,4 +1,4 @@
-import { getRandomInt, getRandomArrayElement } from 'js/util.js';
+import { getRandomInt, getRandomArrayElement } from './util.js';
 
 const generateComments = () => {
   const comments = [];
@@ -29,7 +29,6 @@ const generateComments = () => {
   return comments;
 };
 
-// Функция для генерации массива фотографий
 const generatePhotos = () => {
   const photos = [];
 
@@ -45,3 +44,5 @@ const generatePhotos = () => {
 
   return photos;
 };
+
+export { generatePhotos };
