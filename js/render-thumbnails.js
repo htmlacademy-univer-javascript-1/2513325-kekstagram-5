@@ -1,3 +1,5 @@
+import { openBigPicture } from './big-picture.js';
+
 function renderThumbnails(photos) {
   const template = document.querySelector('#picture').content.querySelector('.picture');
   const picturesContainer = document.querySelector('.pictures');
@@ -9,6 +11,10 @@ function renderThumbnails(photos) {
     photoElement.querySelector('.picture__img').alt = photo.description;
     photoElement.querySelector('.picture__likes').textContent = photo.likes;
     photoElement.querySelector('.picture__comments').textContent = photo.comments.length;
+
+    // Добавляем обработчик клика для открытия полноразмерного изображения
+    photoElement.addEventListener('click', () => openBigPicture(photo));
+
     fragment.appendChild(photoElement);
   });
 
