@@ -1,5 +1,8 @@
 // Функция для генерации случайного целого числа
-export const getRandomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+export function getRandomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
-// Функция для получения случайного элемента из массива
-export const getRandomArrayElement = (arr) => arr[getRandomInt(0, arr.length - 1)];
+export function getRandomArrayElement(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
