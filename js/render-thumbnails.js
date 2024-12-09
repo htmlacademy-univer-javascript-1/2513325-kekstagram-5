@@ -18,6 +18,7 @@ function renderThumbnails(photos) {
     fragment.appendChild(photoElement);
   });
 
+  // Безопасное добавление миниатюр в DOM
   picturesContainer.appendChild(fragment);
 }
 
