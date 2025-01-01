@@ -3,6 +3,8 @@ import { openBigPicture } from './big-picture.js';
 function renderThumbnails(photos) {
   const template = document.querySelector('#picture').content.querySelector('.picture');
   const picturesContainer = document.querySelector('.pictures');
+
+
   const fragment = document.createDocumentFragment();
 
   photos.forEach((photo) => {
