@@ -4,6 +4,8 @@ function renderThumbnails(photos) {
   const template = document.querySelector('#picture').content.querySelector('.picture');
   const picturesContainer = document.querySelector('.pictures');
 
+  // Очищаем контейнер
+  picturesContainer.querySelectorAll('.picture').forEach((picture) => picture.remove());
 
   const fragment = document.createDocumentFragment();
 
@@ -14,7 +16,6 @@ function renderThumbnails(photos) {
     photoElement.querySelector('.picture__likes').textContent = photo.likes;
     photoElement.querySelector('.picture__comments').textContent = photo.comments.length;
 
-    // Добавляем обработчик клика для открытия полноразмерного изображения
     photoElement.addEventListener('click', () => openBigPicture(photo));
 
     fragment.appendChild(photoElement);
