@@ -56,3 +56,12 @@ fetchData()
     // eslint-disable-next-line no-console
     console.error('Ошибка загрузки данных:', error);
   });
+
+fetchData()
+  .then(renderThumbnails)
+  .catch(() => {
+    const errorElement = document.createElement('div');
+    errorElement.textContent = 'Ошибка загрузки изображений!';
+    errorElement.className = 'error-message';
+    document.body.appendChild(errorElement);
+  });

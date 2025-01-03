@@ -1,6 +1,7 @@
 import { sendData } from './api.js';
 
 const form = document.querySelector('.img-upload__form');
+const hashtagsInput = form.querySelector('.text__hashtags');
 const uploadInput = form.querySelector('.img-upload__input');
 const closeButton = form.querySelector('.img-upload__cancel');
 const submitButton = form.querySelector('.img-upload__submit');
@@ -32,7 +33,7 @@ const updateScale = (value) => {
   imgPreview.style.transform = `scale(${value / 100})`;
 };
 
-// Инициализация noUiSlider
+// noUiSlider
 if (!effectSlider.noUiSlider) {
   noUiSlider.create(effectSlider, {
     range: {
@@ -223,3 +224,53 @@ document.addEventListener('keydown', (evt) => {
     closeForm();
   }
 });
+
+// Функция для валидации хэштегов
+const validateHashtags = (value) => {
+  if (!value.trim()) {
+    return true;
+  }
+
+  const hashtags = value.trim().toLowerCase().split(/\s+/);
+  const regex = /^#[a-zа-яё0-9]{1,19}$/i;
+
+  // Проверка условий
+  if (hashtags.length > 5) {
+    return false; // Не более 5 хэштегов
+  }
+
+  const isValidFormat = hashtags.every((tag) => regex.test(tag));
+  const hasUniqueTags = new Set(hashtags).size === hashtags.length;
+
+  return isValidFormat && hasUniqueTags;
+};
+
+// Сообщение об ошибке
+const getHashtagErrorMessage = () =>
+  'Хэштеги должны начинаться с #, быть уникальными, не длиннее 20 символов и не больше 5.';
+
+// Инициализация Pristine
+const pristine = new Pristine(form, {
+  classTo: 'img-upload__field-wrapper',
+  errorClass: 'form__error',
+  successClass: 'form__success',
+});
+
+// Добавляем валидатор для хэштегов
+pristine.addValidator(
+  hashtagsInput,
+  validateHashtags,
+  getHashtagErrorMessage
+);
+
+// Обработчик отправки формы
+form.addEventListener('submit', (evt) => {
+  evt.preventDefault();
+  const isValid = pristine.validate();
+  if (isValid) {
+    // Данные валидны, отправляем
+    sendData(new FormData(form));
+  }
+});
+
+
