@@ -15,22 +15,22 @@ let currentComments = [];
 let currentShownCount = 0;
 
 // Обработчик клавиши Esc
-function onEscKeyDown(evt) {
+const onEscKeyDown = (evt) => {
   if (evt.key === 'Escape') {
     evt.preventDefault();
     closeBigPicture();
   }
-}
+};
 
 // Обработчик кнопки закрытия
-function onCloseButtonClick() {
+const onCloseButtonClick = () => {
   closeBigPicture();
-}
+};
 
 // Обработчик загрузки дополнительных комментариев
-function onCommentsLoaderClick() {
+const onCommentsLoaderClick = () => {
   showComments();
-}
+};
 
 // Функция для закрытия окна
 function closeBigPicture() {
@@ -38,9 +38,9 @@ function closeBigPicture() {
   document.body.classList.remove('modal-open');
 
   // Удаление обработчиков событий
-  document.removeEventListener('keydown', onEscKeyDown);
-  closeButton.removeEventListener('click', onCloseButtonClick);
-  commentsLoaderButton.removeEventListener('click', onCommentsLoaderClick);
+  document.removeEventListener('keydown', onEscKeyDown); // Удаляем обработчик Esc
+  closeButton.removeEventListener('click', onCloseButtonClick); // Удаляем обработчик кнопки закрытия
+  commentsLoaderButton.removeEventListener('click', onCommentsLoaderClick); // Удаляем обработчик загрузки комментариев
 }
 
 // Функция для открытия окна
@@ -50,9 +50,9 @@ function openBigPicture(photo) {
   document.body.classList.add('modal-open');
 
   // Добавление обработчиков событий
-  document.addEventListener('keydown', onEscKeyDown);
-  closeButton.addEventListener('click', onCloseButtonClick);
-  commentsLoaderButton.addEventListener('click', onCommentsLoaderClick);
+  document.addEventListener('keydown', onEscKeyDown); // Добавляем обработчик Esc
+  closeButton.addEventListener('click', onCloseButtonClick); // Добавляем обработчик кнопки закрытия
+  commentsLoaderButton.addEventListener('click', onCommentsLoaderClick); // Добавляем обработчик загрузки комментариев
 }
 
 // Функция для заполнения данных в полноразмерное окно
