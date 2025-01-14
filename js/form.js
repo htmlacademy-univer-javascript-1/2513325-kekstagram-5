@@ -148,6 +148,12 @@ const loadFile = () => {
   }
 };
 
+// Добавление вызова loadFile
+uploadInput.addEventListener('change', () => {
+  openForm();
+  loadFile(); // Функция теперь вызывается
+});
+
 // Обработчик уменьшения масштаба
 scaleControlSmaller.addEventListener('click', () => {
   let currentScale = parseInt(scaleControlValue.value, 10);
@@ -236,21 +242,34 @@ form.addEventListener('submit', (evt) => {
     });
 });
 
-// Обработчик изменения значения поля загрузки
-uploadInput.addEventListener('change', () => {
-  openForm();
-  loadFile();
-});
-
-// Обработчик закрытия формы по кнопке
-closeButton.addEventListener('click', closeForm);
-
-// Обработчик закрытия формы по клавише Esc
-document.addEventListener('keydown', (evt) => {
+// Обработчик Esc
+const onEscKeyDown = (evt) => {
   if (evt.key === 'Escape' && !overlay.classList.contains(CLASS_HIDDEN)) {
+    evt.preventDefault();
     closeForm();
   }
+};
+
+const addDocumentListeners = () => {
+  document.addEventListener('keydown', onEscKeyDown);
+};
+
+const removeDocumentListeners = () => {
+  document.removeEventListener('keydown', onEscKeyDown);
+};
+
+// Добавление события для загрузки файла
+uploadInput.addEventListener('change', () => {
+  openForm();
+  addDocumentListeners();
 });
+
+//  закрытия формы
+closeButton.addEventListener('click', () => {
+  closeForm();
+  removeDocumentListeners();
+});
+
 
 // Инициализация Pristine
 const pristine = new Pristine(form, {
@@ -310,17 +329,17 @@ form.addEventListener('input', () => {
 form.addEventListener('submit', (evt) => {
   evt.preventDefault();
 
-  // Проверка валидации
   if (pristine.validate()) {
-    // Отправка данных на сервер
+    submitButton.disabled = true;
     const formData = new FormData(form);
     sendData(formData)
       .then(() => {
+        closeForm();
         showSuccessMessage();
-        form.reset();
       })
-      .catch(() => {
-        showErrorMessage();
+      .catch(showErrorMessage)
+      .finally(() => {
+        submitButton.disabled = false;
       });
   }
 });
