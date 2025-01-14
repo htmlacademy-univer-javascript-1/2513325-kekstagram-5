@@ -27,17 +27,14 @@ fetchData()
     imgFilters.classList.remove('img-filters--inactive');
 
     let currentFilter = filterDefault;
-
-    // Добавляем обработчики фильтров
     filterButtons.forEach((button) => {
-      button.addEventListener(
-        'click',
-        debounce((evt) => {
-          // Меняем активную кнопку
-          filterButtons.forEach((btn) => btn.classList.remove('img-filters__button--active'));
-          evt.target.classList.add('img-filters__button--active');
+      button.addEventListener('click', (evt) => {
+        // Подсветка кнопки без задержки
+        filterButtons.forEach((btn) => btn.classList.remove('img-filters__button--active'));
+        evt.target.classList.add('img-filters__button--active');
 
-          // Применяем соответствующий фильтр
+        // Фильтрация фотографий с задержкой
+        debounce(() => {
           if (evt.target.id === 'filter-default') {
             currentFilter = filterDefault;
           } else if (evt.target.id === 'filter-random') {
@@ -45,14 +42,9 @@ fetchData()
           } else if (evt.target.id === 'filter-discussed') {
             currentFilter = filterDiscussed;
           }
-
-          // Применяем фильтр
           applyFilter(photos, currentFilter);
-        }, RERENDER_DELAY)
-      );
+        }, RERENDER_DELAY)();
+      });
     });
-  })
-  .catch((error) => {
-    // eslint-disable-next-line no-console
-    console.error('Ошибка загрузки данных:', error);
   });
+

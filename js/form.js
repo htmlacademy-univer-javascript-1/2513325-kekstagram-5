@@ -1,5 +1,13 @@
 import { sendData } from './api.js';
 
+const MAX_HASHTAGS = 5;
+const CLASS_HIDDEN = 'hidden';
+const MODAL_OPEN_CLASS = 'modal-open';
+const FILE_TYPES = ['jpg', 'jpeg', 'png'];
+const SCALE_STEP = 25;
+const SCALE_MIN = 25;
+const SCALE_MAX = 100;
+
 const form = document.querySelector('.img-upload__form');
 const uploadInput = form.querySelector('.img-upload__input');
 const closeButton = form.querySelector('.img-upload__cancel');
@@ -15,13 +23,6 @@ const scaleControlValue = form.querySelector('.scale__control--value');
 const effectSlider = form.querySelector('.effect-level__slider');
 const effectLevel = form.querySelector('.effect-level__value');
 const effectsList = form.querySelector('.effects__list');
-
-const CLASS_HIDDEN = 'hidden';
-const MODAL_OPEN_CLASS = 'modal-open';
-const FILE_TYPES = ['jpg', 'jpeg', 'png'];
-const SCALE_STEP = 25;
-const SCALE_MIN = 25;
-const SCALE_MAX = 100;
 
 const successTemplate = document.querySelector('#success').content.querySelector('.success');
 const errorTemplate = document.querySelector('#error').content.querySelector('.error');
@@ -101,6 +102,16 @@ effectSlider.noUiSlider.on('update', (_, handle, unencoded) => {
 const openForm = () => {
   overlay.classList.remove(CLASS_HIDDEN);
   body.classList.add(MODAL_OPEN_CLASS);
+  // Получаем текущий выбранный эффект
+  const selectedEffect = form.querySelector('.effects__radio:checked').value;
+
+  // Если выбран "Оригинал", скрываем слайдер
+  if (selectedEffect === 'none') {
+    effectSlider.classList.add(CLASS_HIDDEN);
+  } else {
+    // В противном случае, показываем слайдер
+    effectSlider.classList.remove(CLASS_HIDDEN);
+  }
   updateScale(100); // Сбрасываем масштаб
   imgPreview.style.filter = ''; // Сбрасываем эффекты
 };
@@ -157,6 +168,12 @@ scaleControlBigger.addEventListener('click', () => {
 
 // Функция для успешного сообщения
 const showSuccessMessage = () => {
+  // Проверка, есть ли уже сообщение об успехе
+  const existingSuccessMessage = document.querySelector('.success');
+  if (existingSuccessMessage) {
+    return; // Если сообщение уже есть, ничего не делаем
+  }
+
   const successElement = successTemplate.cloneNode(true);
   document.body.appendChild(successElement);
 
@@ -171,20 +188,31 @@ const showSuccessMessage = () => {
   });
 };
 
+
 // Функция для сообщения об ошибке
 const showErrorMessage = () => {
   const errorElement = errorTemplate.cloneNode(true);
   document.body.appendChild(errorElement);
 
-  errorElement.querySelector('.error__button').addEventListener('click', () => {
-    errorElement.remove();
-  });
-
-  document.addEventListener('keydown', (evt) => {
+  // Обработчик нажатия клавиши Esc
+  function onEscPress(evt) {
     if (evt.key === 'Escape') {
-      errorElement.remove();
+      evt.preventDefault(); // Отменяем стандартное поведение (например, закрытие других модальных окон)
+      closeError(); // Закрываем сообщение об ошибке
     }
-  });
+  }
+
+  // Функция для закрытия сообщения
+  function closeError() {
+    errorElement.remove();
+    document.removeEventListener('keydown', onEscPress); // Убираем обработчик Esc
+  }
+
+  // Добавляем обработчик на клавишу Esc
+  document.addEventListener('keydown', onEscPress);
+
+  // Добавляем обработчик для закрытия через кнопку
+  errorElement.querySelector('.error__button').addEventListener('click', closeError);
 };
 
 // Обработчик отправки формы
@@ -221,5 +249,78 @@ closeButton.addEventListener('click', closeForm);
 document.addEventListener('keydown', (evt) => {
   if (evt.key === 'Escape' && !overlay.classList.contains(CLASS_HIDDEN)) {
     closeForm();
+  }
+});
+
+// Инициализация Pristine
+const pristine = new Pristine(form, {
+  classTo: 'img-upload__field-wrapper',
+  errorClass: 'img-upload__field-wrapper--invalid',
+  successClass: 'img-upload__field-wrapper--valid',
+  errorTextParent: 'img-upload__field-wrapper',
+  errorTextTag: 'div',
+  errorTextClass: 'form__error',
+});
+
+// Валидация: один хэш-тег
+const validateHashtag = (value) => {
+  const hashtagRegex = /^#[a-zа-яё0-9]{1,19}$/i;
+  const hashtags = value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  return hashtags.every((tag) => hashtagRegex.test(tag));
+};
+
+// Валидация: количество хэш-тегов
+const validateHashtagCount = (value) => {
+  const hashtags = value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  return hashtags.length <= MAX_HASHTAGS;
+};
+
+// Валидация: уникальность хэш-тегов
+const validateHashtagUnique = (value) => {
+  const hashtags = value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  const uniqueHashtags = new Set(hashtags);
+  return uniqueHashtags.size === hashtags.length;
+};
+
+// Добавление валидаторов
+pristine.addValidator(
+  form.querySelector('.text__hashtags'),
+  validateHashtag,
+  'Каждый хэш-тег должен начинаться с # и содержать только буквы и цифры, длиной до 20 символов.'
+);
+
+pristine.addValidator(
+  form.querySelector('.text__hashtags'),
+  validateHashtagCount,
+  `Максимум ${MAX_HASHTAGS} хэш-тегов.`
+);
+
+pristine.addValidator(
+  form.querySelector('.text__hashtags'),
+  validateHashtagUnique,
+  'Хэш-теги не должны повторяться.'
+);
+
+// Блокировка кнопки отправки при ошибках
+form.addEventListener('input', () => {
+  submitButton.disabled = !pristine.validate();
+});
+
+// Обработчик отправки формы
+form.addEventListener('submit', (evt) => {
+  evt.preventDefault();
+
+  // Проверка валидации
+  if (pristine.validate()) {
+    // Отправка данных на сервер
+    const formData = new FormData(form);
+    sendData(formData)
+      .then(() => {
+        showSuccessMessage();
+        form.reset();
+      })
+      .catch(() => {
+        showErrorMessage();
+      });
   }
 });
