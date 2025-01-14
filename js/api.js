@@ -9,13 +9,12 @@ const fetchData = async () => {
     }
     return await response.json();
   } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error(error);
-    throw error;
+    // eslint-disable-next-line no-alert
+    alert('Не удалось загрузить данные. Попробуйте позже.');
+    throw error; // Логируется только в случае сетевой ошибки
   }
 };
 
-// Функция для отправки данных
 const sendData = async (data) => {
   try {
     const response = await fetch(`${SERVER_URL}`, {
@@ -27,9 +26,9 @@ const sendData = async (data) => {
     }
     return await response.json();
   } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error(error);
-    throw error;
+    // eslint-disable-next-line no-alert
+    alert('Ошибка отправки формы. Попробуйте позже.');
+    throw error; // Логируется только сетевое исключение
   }
 };
 
