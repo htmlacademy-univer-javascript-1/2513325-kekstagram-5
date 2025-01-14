@@ -15,3 +15,4 @@ export function debounce(callback, delay) {
     timeout = setTimeout(() => callback.apply(this, args), delay);
   };
 }
+
